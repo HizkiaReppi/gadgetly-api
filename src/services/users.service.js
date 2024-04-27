@@ -14,7 +14,7 @@ import prisma from '../utils/database.js';
 import ResponseError from '../errors/ResponseError.js';
 import NotFoundError from '../errors/NotFoundError.js';
 
-const _findByEmail = async (email) => {
+const findByEmail = async (email) => {
   const data = await validate(getUserByEmailSchema, { email });
 
   const user = await prisma.user.findUnique({
@@ -35,7 +35,7 @@ const _findByUsername = async (username) => {
 };
 
 const _checkDataExistence = async (username, email) => {
-  const isEmailExists = await _findByEmail(email);
+  const isEmailExists = await findByEmail(email);
   if (isEmailExists) throw new ResponseError('Email telah terdaftar.', 400);
 
   const isUsernameExists = await _findByUsername(username);
@@ -177,6 +177,7 @@ export default {
   create,
   findAll,
   findById,
+  findByEmail,
   update,
   updatePassword,
   destroy,

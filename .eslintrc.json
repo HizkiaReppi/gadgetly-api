@@ -23,6 +23,7 @@
     "no-undef-init": "error",
     "camelcase": "error",
     "eqeqeq": "error",
-    "new-cap": "off"
+    "new-cap": "off",
+    "import/prefer-default-export": "off"
   }
 }
