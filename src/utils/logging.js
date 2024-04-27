@@ -1,6 +1,5 @@
-import winston from 'winston';
+import winston, { format, transports } from 'winston';
 import moment from 'moment';
-import { format, transports } from 'winston';
 
 const { combine, printf } = format;
 
@@ -29,6 +28,7 @@ const logFormat = printf(({ level, message, timestamp }) => {
 });
 
 const customTimestamp = format((info) => {
+  // eslint-disable-next-line no-param-reassign
   info.timestamp = moment().format('YYYY-MM-DD HH:mm:ss');
   return info;
 });
