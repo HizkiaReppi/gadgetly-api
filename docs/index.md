@@ -2,6 +2,7 @@
 
 ## Version 1
 
-1. [Users Management](users.md)
+1. [Authentication](auth.md)
+2. [Users Management](users.md)
 
 ##### Create By Hizkia Reppi

@@ -9,6 +9,8 @@
 5. [Update Password](#update-password)
 6. [Delete User](#delete-user)
 
+---
+
 ### Create User
 
 Membuat pengguna baru.
@@ -43,7 +45,8 @@ POST /api/v1/users/
   "name": "John Doe",
   "username": "johndoe123",
   "email": "johndoe@example.com",
-  "password": "Password123"
+  "password": "Password123",
+  "confirm_password": "Password123"
 }
 ```
 
@@ -130,6 +133,8 @@ POST /api/v1/users/
   }
   ```
 
+---
+
 ### Get All Users
 
 Mengambil daftar semua pengguna.
@@ -207,6 +212,8 @@ GET /api/v1/users/?limit=10&page=1
   }
   ```
 
+---
+
 ### Get Detail User By ID
 
 Mengambil detail pengguna berdasarkan ID.
@@ -255,6 +262,8 @@ GET /api/v1/users/123456
   }
 }
 ```
+
+---
 
 ### Update User
 
@@ -326,6 +335,8 @@ PATCH /api/v1/users/:id
 }
 ```
 
+---
+
 ### Update Password
 
 Mengupdate kata sandi pengguna berdasarkan ID.
@@ -393,6 +404,8 @@ PUT /api/v1/users/:id/password
   }
 }
 ```
+
+---
 
 ### Delete User
 
