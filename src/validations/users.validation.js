@@ -41,6 +41,13 @@ export const createUserSchema = Joi.object({
       'any.required': 'Password wajib diisi.',
       'string.min': 'Password harus memiliki panjang minimal 6 karakter.',
     }),
+  confirm_password: Joi.string()
+    .valid(Joi.ref('password'))
+    .required()
+    .messages({
+      'any.only': 'Konfirmasi kata sandi harus sama dengan kata sandi.',
+      'any.required': 'Konfirmasi kata sandi wajib diisi.',
+    }),
   role: Joi.string().valid('USER', 'ADMIN').default('USER').messages({
     'any.only': 'Role tidak valid.',
   }),

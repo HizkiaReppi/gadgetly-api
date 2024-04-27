@@ -28,12 +28,13 @@ POST /api/v1/users/
 
 #### Body
 
-| Field    | Type   | Deskripsi                     |
-| -------- | ------ | ----------------------------- |
-| name     | string | Nama pengguna.                |
-| username | string | Username unik untuk pengguna. |
-| email    | string | Alamat email pengguna.        |
-| password | string | Kata sandi pengguna.          |
+| Field            | Type   | Deskripsi                     |
+| ---------------- | ------ | ----------------------------- |
+| name             | string | Nama pengguna.                |
+| username         | string | Username unik untuk pengguna. |
+| email            | string | Alamat email pengguna.        |
+| password         | string | Kata sandi pengguna.          |
+| confirm_password | string | Konfirmasi kata sandi.        |
 
 #### Contoh Body:
 
@@ -48,15 +49,16 @@ POST /api/v1/users/
 
 #### Body Validation
 
-| Field    | Type   | Required | Rule                                                  |
-| -------- | ------ | -------- | ----------------------------------------------------- |
-| name     | string | true     | Minimal: 3 karakter, maksimal: 100 karakter           |
-|          |        |          | Hanya boleh berisi huruf.                             |
-| username | string | true     | Minimal: 3 karakter, maksimal: 50 karakter,           |
-|          |        |          | Hanya boleh berisi huruf dan angka, diawali huruf.    |
-| email    | string | true     | Format email, maksimal: 255 karakter.                 |
-| password | string | true     | Minimal: 6 karakter, maksimal: 255 karakter,          |
-|          |        |          | Harus mengandung huruf besar, huruf kecil, dan angka. |
+| Field            | Type   | Required | Rule                                                  |
+| ---------------- | ------ | -------- | ----------------------------------------------------- |
+| name             | string | true     | Minimal: 3 karakter, maksimal: 100 karakter           |
+|                  |        |          | Hanya boleh berisi huruf.                             |
+| username         | string | true     | Minimal: 3 karakter, maksimal: 50 karakter,           |
+|                  |        |          | Hanya boleh berisi huruf dan angka, diawali huruf.    |
+| email            | string | true     | Format email, maksimal: 255 karakter.                 |
+| password         | string | true     | Minimal: 6 karakter, maksimal: 255 karakter,          |
+|                  |        |          | Harus mengandung huruf besar, huruf kecil, dan angka. |
+| confirm_password | string | true     | Harus sama dengan kata sandi.                         |
 
 #### Respons
 
