@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import config from '../config/config.js';
 import prisma from './database.js';
 import { generateToken as generateJwtToken } from './jwt.js';
@@ -51,4 +52,46 @@ export const generateToken = async (data) => {
   );
 
   return { accessToken, refreshToken };
+};
+
+/**
+ * Generate strong random password
+ *
+ * @return {Promise<string>}
+ */
+export const generateStrongRandomPassword = async () => {
+  const length = 20;
+  const charset =
+    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
+  let password = '';
+
+  const values = new Uint32Array(length);
+  crypto.getRandomValues(values);
+
+  // eslint-disable-next-line no-plusplus
+  for (let i = 0; i < length; i++) {
+    const randomIndex = values[i] % charset.length;
+    password += charset[randomIndex];
+  }
+
+  return hash(password);
+};
+
+/**
+ * Generate strong random password
+ *
+ * @param {string} username
+ * @return {Promise<string>}
+ */
+export const generateUsername = async (username) => {
+  let newUsername = `${username}_`;
+  const charset = 'abcdefghijklmnopqrstuvwxyz0123456789';
+
+  // eslint-disable-next-line no-plusplus
+  for (let i = 0; i < 5; i++) {
+    const randomIndex = Math.floor(Math.random() * charset.length);
+    newUsername += charset[randomIndex];
+  }
+
+  return newUsername;
 };
