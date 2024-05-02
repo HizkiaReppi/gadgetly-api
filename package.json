@@ -1,5 +1,5 @@
 {
-  "name": "e-commerce",
+  "name": "gadgetly",
   "version": "1.0.0",
   "description": "E Commerce API | Massive Challenge Project | Celerates Acceleration Program - Web Development & UI/UX Design",
   "main": "src/index.js",
@@ -15,6 +15,7 @@
     "generate": "prisma generate"
   },
   "keywords": [
+    "Gadgetly",
     "E-Commerce"
   ],
   "author": "Hizkia Reppi",
