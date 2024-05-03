@@ -22,6 +22,7 @@
   - NodeJS
   - ExpressJS
   - MySQL
+  - Amazon Web Service S3
 
 ### Frontend Repository
 
