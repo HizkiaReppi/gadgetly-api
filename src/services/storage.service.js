@@ -45,11 +45,12 @@ export const createPreSignedUrl = ({ bucket, key }) => {
 /**
  * Writes a list of files to an S3 bucket.
  *
- * @param {File[]} files - a list of files to upload
- * @return {Promise<string[]>} - a list of presigned URLs for the uploaded files
+ * @param {File[]} files - A list of files to upload.
+ * @return {Promise<Array<{key: string, presignedUrl: string}>>} - A list of objects,
+ * each containing the S3 key and a presigned URL for the uploaded file.
  */
 export const writeFile = async (files) => {
-  const uploadedFiles = [];
+  const results = [];
 
   try {
     await Promise.all(
@@ -62,9 +63,11 @@ export const writeFile = async (files) => {
         }
 
         const filename = formatFileName(file.originalname);
+        const key = `${directory}/${filename}`;
+
         const params = {
           Bucket: config.aws.s3.bucket,
-          Key: `${directory}/${filename}`,
+          Key: key,
           Body: file.buffer,
           ContentType: file.mimetype,
         };
@@ -73,13 +76,14 @@ export const writeFile = async (files) => {
 
         const presignedUrl = await createPreSignedUrl({
           bucket: config.aws.s3.bucket,
-          key: `${directory}/${filename}`,
+          key,
         });
-        uploadedFiles.push(presignedUrl);
+
+        results.push({ key, presignedUrl });
       }),
     );
 
-    return uploadedFiles;
+    return results;
   } catch (error) {
     logger.error('Error writing file:', error);
     throw error;
