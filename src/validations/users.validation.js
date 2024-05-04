@@ -51,6 +51,23 @@ export const createUserSchema = Joi.object({
   role: Joi.string().valid('USER', 'ADMIN').default('USER').messages({
     'any.only': 'Role tidak valid.',
   }),
+  file: Joi.object({
+    fieldname: Joi.string().optional(),
+    originalname: Joi.string().optional(),
+    mimetype: Joi.string()
+      .valid('image/jpeg', 'image/jpg', 'image/png')
+      .optional()
+      .messages({
+        'string.base': 'Tipe file foto tidak valid.',
+        'any.only': 'Hanya format JPEG, JPG atau PNG yang diperbolehkan.',
+      }),
+    buffer: Joi.binary().optional(),
+    encoding: Joi.string().optional(),
+    size: Joi.number().integer().min(0).max(2097152).optional().messages({
+      'number.min': 'Ukuran file maksimal 2mb.',
+      'number.max': 'Ukuran file maksimal 2mb.',
+    }),
+  }),
 });
 
 export const getAllUserSchema = Joi.object({

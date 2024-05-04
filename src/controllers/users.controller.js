@@ -6,7 +6,9 @@ const response = new Response();
 
 const create = async (req, res, next) => {
   try {
-    const data = await usersService.create(req.body);
+    const payload = { ...req.body, file: req.file };
+
+    const data = await usersService.create(payload);
 
     logger.info(`Data berhasil ditambahkan: ${data.id}`);
 

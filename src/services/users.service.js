@@ -13,6 +13,7 @@ import validate from '../utils/validation.js';
 import prisma from '../utils/database.js';
 import ResponseError from '../errors/ResponseError.js';
 import NotFoundError from '../errors/NotFoundError.js';
+import { writeFile } from './storage.service.js';
 
 const findByEmail = async (email) => {
   const data = await validate(getUserByEmailSchema, { email });
@@ -50,19 +51,27 @@ const create = async (payload) => {
 
   const hashedPassword = await hash(data.password);
 
+  let photo;
+  if (!data.file) {
+    photo = null;
+  } else {
+    const extension = data.file.mimetype.split('/').pop();
+    data.file.originalname = `${data.username}-photo_profile.${extension}`;
+
+    const files = [data.file];
+
+    const result = await writeFile(files);
+
+    photo = result[0].key;
+  }
+
   const user = await prisma.user.create({
     data: {
       name: data.name,
       username: data.username,
       email: data.email,
       password: hashedPassword,
-    },
-    select: {
-      id: true,
-      username: true,
-      name: true,
-      email: true,
-      created_at: true,
+      photo,
     },
   });
 
