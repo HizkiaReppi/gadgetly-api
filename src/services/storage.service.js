@@ -2,6 +2,7 @@ import {
   S3Client,
   PutObjectCommand,
   GetObjectCommand,
+  DeleteObjectsCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { v4 as uuid } from 'uuid';
@@ -86,6 +87,29 @@ export const writeFile = async (files) => {
     return results;
   } catch (error) {
     logger.error('Error writing file:', error);
+    throw error;
+  }
+};
+
+/**
+ * Deletes multiple objects from an S3 bucket in a single request.
+ *
+ * @param {Key[string]} keys - The keys of the objects to delete.
+ * @return {Promise<void>}
+ */
+export const deleteFile = async (keys) => {
+  const params = {
+    Bucket: config.aws.s3.bucket,
+    Delete: {
+      Objects: keys.map((key) => ({ Key: key })),
+    },
+  };
+
+  try {
+    await S3.send(new DeleteObjectsCommand(params));
+    logger.info(`Files deleted: ${keys.join(', ')}`);
+  } catch (error) {
+    logger.error('Error deleting files:', error);
     throw error;
   }
 };
