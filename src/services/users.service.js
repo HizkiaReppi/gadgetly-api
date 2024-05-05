@@ -13,6 +13,7 @@ import validate from '../utils/validation.js';
 import prisma from '../utils/database.js';
 import ResponseError from '../errors/ResponseError.js';
 import NotFoundError from '../errors/NotFoundError.js';
+import { writeFile, deleteFile } from './storage.service.js';
 
 const findByEmail = async (email) => {
   const data = await validate(getUserByEmailSchema, { email });
@@ -50,19 +51,27 @@ const create = async (payload) => {
 
   const hashedPassword = await hash(data.password);
 
+  let photo;
+  if (!data.file) {
+    photo = null;
+  } else {
+    const extension = data.file.mimetype.split('/').pop();
+    data.file.originalname = `${data.username}-photo_profile.${extension}`;
+
+    const files = [data.file];
+
+    const result = await writeFile(files);
+
+    photo = result[0].key;
+  }
+
   const user = await prisma.user.create({
     data: {
       name: data.name,
       username: data.username,
       email: data.email,
       password: hashedPassword,
-    },
-    select: {
-      id: true,
-      username: true,
-      name: true,
-      email: true,
-      created_at: true,
+      photo,
     },
   });
 
@@ -79,6 +88,7 @@ const findAll = async (limit, page) => {
     select: {
       id: true,
       name: true,
+      username: true,
       email: true,
       created_at: true,
       updated_at: true,
@@ -124,6 +134,28 @@ const update = async (id, payload) => {
     },
   });
 
+  if (data.file) {
+    if (isUserExist.photo && isUserExist.photo.startsWith('images/')) {
+      await deleteFile([isUserExist.photo]);
+    }
+
+    const extension = data.file.mimetype.split('/').pop();
+    data.file.originalname = `${user.username}-photo_profile.${extension}`;
+
+    const files = [data.file];
+
+    const result = await writeFile(files);
+
+    await prisma.user.update({
+      where: { id },
+      data: {
+        photo: result[0].key,
+      },
+    });
+
+    user.photo = result[0].key;
+  }
+
   return user;
 };
 
@@ -163,9 +195,15 @@ const destroy = async (id) => {
   const isUserExist = await findById(data.id);
   if (!isUserExist) throw new NotFoundError('Pengguna tidak ditemukan.');
 
-  return prisma.user.delete({
+  await prisma.user.delete({
     where: { id: data.id },
   });
+
+  if (isUserExist.photo && isUserExist.photo.startsWith('images/')) {
+    await deleteFile([isUserExist.photo]);
+  }
+
+  return true;
 };
 
 const count = async () => {
