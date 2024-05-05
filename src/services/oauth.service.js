@@ -77,13 +77,7 @@ const findAndCreateUser = async (googleUser) => {
           username,
           email: googleUser.email,
           password,
-        },
-        select: {
-          id: true,
-          username: true,
-          name: true,
-          email: true,
-          created_at: true,
+          photo: googleUser.picture,
         },
       });
 
