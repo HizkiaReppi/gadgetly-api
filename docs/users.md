@@ -25,7 +25,7 @@ POST /api/v1/users/
 
 | Key           | Value                 |
 | ------------- | --------------------- |
-| Content-Type  | application/json      |
+| Content-Type  | multipart/form-data   |
 | Authorization | Bearer <access_token> |
 
 #### Body
@@ -37,6 +37,7 @@ POST /api/v1/users/
 | email            | string | Alamat email pengguna.        |
 | password         | string | Kata sandi pengguna.          |
 | confirm_password | string | Konfirmasi kata sandi.        |
+| file             | file   | Foto profile pengguna         |
 
 #### Contoh Body:
 
@@ -46,7 +47,8 @@ POST /api/v1/users/
   "username": "johndoe123",
   "email": "johndoe@example.com",
   "password": "Password123",
-  "confirm_password": "Password123"
+  "confirm_password": "Password123",
+  "file": "file"
 }
 ```
 
@@ -62,6 +64,7 @@ POST /api/v1/users/
 | password         | string | true     | Minimal: 6 karakter, maksimal: 255 karakter,          |
 |                  |        |          | Harus mengandung huruf besar, huruf kecil, dan angka. |
 | confirm_password | string | true     | Harus sama dengan kata sandi.                         |
+| file             | file   | false    | Ukuran maximal: 2mb, filetype: jpeg, jpg, png         |
 
 #### Respons
 
@@ -69,14 +72,21 @@ POST /api/v1/users/
 
 ```json
 {
+  "status": true,
   "code": 201,
   "message": "Data berhasil ditambahkan",
   "data": {
-    "id": "123456",
-    "username": "johndoe123",
+    "id": "61385a81-b27d-49b3-a986-9dee37742375",
     "name": "John Doe",
+    "username": "johndoe123",
     "email": "johndoe@example.com",
-    "created_at": "2024-04-27T12:00:00Z"
+    "password": "$2b$10$N2bObQH9K.cDeNL5qKYs2uHUKkCG4Gr1JjmwcHLOliXk3BV4d3mOW",
+    "role": "USER",
+    "last_login": null,
+    "refresh_token": null,
+    "photo": "images/d66da0ea-a9de-446e-a021-372210d70678-johndoe123-photo_profile.png",
+    "created_at": "2024-05-05T12:46:50.163Z",
+    "updated_at": "2024-05-05T12:46:50.163Z"
   }
 }
 ```
@@ -326,11 +336,12 @@ PATCH /api/v1/users/:id
   "code": 200,
   "message": "Data berhasil diperbaharui",
   "data": {
-    "id": "123456",
+    "id": "61385a81-b27d-49b3-a986-9dee37742375",
     "username": "johndoe123",
     "name": "John Doe",
     "email": "johndoe@example.com",
-    "updated_at": "2024-04-27T12:00:00Z"
+    "updated_at": "2024-05-05T12:46:50.163Z",
+    "photo": "images/d66da0ea-a9de-446e-a021-372210d70678-johndoe123-photo_profile.png"
   }
 }
 ```
@@ -396,11 +407,11 @@ PUT /api/v1/users/:id/password
   "code": 200,
   "message": "Data berhasil diperbaharui",
   "data": {
-    "id": "123456",
+    "id": "61385a81-b27d-49b3-a986-9dee37742375",
     "username": "johndoe123",
     "name": "John Doe",
     "email": "johndoe@example.com",
-    "updated_at": "2024-04-27T12:00:00Z"
+    "updated_at": "2024-05-05T12:46:50.163Z"
   }
 }
 ```

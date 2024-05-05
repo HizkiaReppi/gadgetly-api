@@ -14,7 +14,13 @@ router.post(
 );
 router.get('/', isAuthenticate, usersController.findAll);
 router.get('/:id', isAuthenticate, usersController.findById);
-router.patch('/:id', isAuthenticate, isAdmin, usersController.update);
+router.patch(
+  '/:id',
+  uploader.single('file'),
+  isAuthenticate,
+  isAdmin,
+  usersController.update,
+);
 router.put(
   '/:id/password',
   isAuthenticate,

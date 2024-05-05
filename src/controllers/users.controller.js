@@ -73,7 +73,8 @@ const findById = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   try {
-    const data = await usersService.update(req.params.id, req.body);
+    const payload = { ...req.body, file: req.file };
+    const data = await usersService.update(req.params.id, payload);
 
     logger.info(`Data berhasil diperbaharui: ${data.id}`);
 

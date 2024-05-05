@@ -13,7 +13,7 @@ import validate from '../utils/validation.js';
 import prisma from '../utils/database.js';
 import ResponseError from '../errors/ResponseError.js';
 import NotFoundError from '../errors/NotFoundError.js';
-import { writeFile } from './storage.service.js';
+import { writeFile, deleteFile } from './storage.service.js';
 
 const findByEmail = async (email) => {
   const data = await validate(getUserByEmailSchema, { email });
@@ -132,6 +132,28 @@ const update = async (id, payload) => {
       updated_at: true,
     },
   });
+
+  if (data.file) {
+    if (isUserExist.photo && isUserExist.photo.startsWith('images/')) {
+      await deleteFile([isUserExist.photo]);
+    }
+
+    const extension = data.file.mimetype.split('/').pop();
+    data.file.originalname = `${user.username}-photo_profile.${extension}`;
+
+    const files = [data.file];
+
+    const result = await writeFile(files);
+
+    await prisma.user.update({
+      where: { id },
+      data: {
+        photo: result[0].key,
+      },
+    });
+
+    user.photo = result[0].key;
+  }
 
   return user;
 };
