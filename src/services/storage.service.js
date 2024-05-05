@@ -33,13 +33,14 @@ const formatFileName = (filename) => {
  * This URL can be used to retrieve the object without requiring AWS credentials,
  * and it is valid for a limited time.
  *
- * @param {Object} params - The parameters for creating the presigned URL.
- * @param {string} params.bucket - The name of the S3 bucket.
- * @param {string} params.key - The key of the object in the S3 bucket.
+ * @param {string} key - The key of the object in the S3 bucket.
  * @return {Promise<string>} A promise that resolves to the presigned URL string.
  */
-export const createPreSignedUrl = ({ bucket, key }) => {
-  const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+export const createPreSignedUrl = async (key) => {
+  const command = new GetObjectCommand({
+    Bucket: config.aws.s3.bucket,
+    Key: key,
+  });
   return getSignedUrl(S3, command, { expiresIn: 10_800 });
 };
 
@@ -75,10 +76,7 @@ export const writeFile = async (files) => {
 
         await S3.send(new PutObjectCommand(params));
 
-        const presignedUrl = await createPreSignedUrl({
-          bucket: config.aws.s3.bucket,
-          key,
-        });
+        const presignedUrl = await createPreSignedUrl(key);
 
         results.push({ key, presignedUrl });
       }),

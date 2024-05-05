@@ -13,7 +13,11 @@ import validate from '../utils/validation.js';
 import prisma from '../utils/database.js';
 import ResponseError from '../errors/ResponseError.js';
 import NotFoundError from '../errors/NotFoundError.js';
-import { writeFile, deleteFile } from './storage.service.js';
+import {
+  createPreSignedUrl,
+  writeFile,
+  deleteFile,
+} from './storage.service.js';
 
 const findByEmail = async (email) => {
   const data = await validate(getUserByEmailSchema, { email });
@@ -21,6 +25,12 @@ const findByEmail = async (email) => {
   const user = await prisma.user.findUnique({
     where: { email: data.email },
   });
+
+  if (user?.photo && user?.photo.startsWith('images/')) {
+    const photo = await createPreSignedUrl(user.photo);
+
+    user.photo = photo;
+  }
 
   return user;
 };
@@ -52,6 +62,7 @@ const create = async (payload) => {
   const hashedPassword = await hash(data.password);
 
   let photo;
+  let presignedUrl;
   if (!data.file) {
     photo = null;
   } else {
@@ -63,6 +74,7 @@ const create = async (payload) => {
     const result = await writeFile(files);
 
     photo = result[0].key;
+    presignedUrl = result[0].presignedUrl;
   }
 
   const user = await prisma.user.create({
@@ -74,6 +86,8 @@ const create = async (payload) => {
       photo,
     },
   });
+
+  user.photo = presignedUrl;
 
   return user;
 };
@@ -109,13 +123,19 @@ const findById = async (id) => {
     where: { id: data.id },
   });
 
+  if (user.photo && user.photo.startsWith('images/')) {
+    const photo = await createPreSignedUrl(user.photo);
+
+    user.photo = photo;
+  }
+
   return user;
 };
 
 const update = async (id, payload) => {
   const data = await validate(updateUserSchema, payload);
 
-  const isUserExist = await findById(id);
+  const isUserExist = await prisma.user.findUnique({ where: { id } });
   if (!isUserExist) throw new NotFoundError('Pengguna tidak ditemukan.');
 
   const user = await prisma.user.update({
@@ -153,7 +173,9 @@ const update = async (id, payload) => {
       },
     });
 
-    user.photo = result[0].key;
+    const userPhoto = result[0].presignedUrl;
+
+    user.photo = userPhoto;
   }
 
   return user;
@@ -162,7 +184,7 @@ const update = async (id, payload) => {
 const updatePassword = async (id, payload) => {
   const data = await validate(updateUserPasswordSchema, payload);
 
-  const user = await findById(id);
+  const user = await prisma.user.findUnique({ where: { id } });
   if (!user) throw new NotFoundError('Pengguna tidak ditemukan.');
 
   const isPasswordMatch = await compare(data.old_password, user.password);
@@ -192,7 +214,7 @@ const updatePassword = async (id, payload) => {
 const destroy = async (id) => {
   const data = await validate(getUserByIdSchema, { id });
 
-  const isUserExist = await findById(data.id);
+  const isUserExist = await prisma.user.findUnique({ where: { id } });
   if (!isUserExist) throw new NotFoundError('Pengguna tidak ditemukan.');
 
   await prisma.user.delete({
