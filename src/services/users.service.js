@@ -88,6 +88,7 @@ const findAll = async (limit, page) => {
     select: {
       id: true,
       name: true,
+      username: true,
       email: true,
       created_at: true,
       updated_at: true,
@@ -194,9 +195,15 @@ const destroy = async (id) => {
   const isUserExist = await findById(data.id);
   if (!isUserExist) throw new NotFoundError('Pengguna tidak ditemukan.');
 
-  return prisma.user.delete({
+  await prisma.user.delete({
     where: { id: data.id },
   });
+
+  if (isUserExist.photo && isUserExist.photo.startsWith('images/')) {
+    await deleteFile([isUserExist.photo]);
+  }
+
+  return true;
 };
 
 const count = async () => {

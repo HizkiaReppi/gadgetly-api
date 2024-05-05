@@ -185,18 +185,19 @@ GET /api/v1/users/?limit=10&page=1
   "message": "Semua data berhasil diambil",
   "data": [
     {
-      "id": "123456",
-      "name": "John Doe",
-      "email": "johndoe@example.com",
-      "created_at": "2024-04-27T12:00:00Z",
-      "updated_at": "2024-04-27T12:00:00Z"
-    },
-    {
-      "id": "678910",
+      "id": "38603954-3645-4788-9462-0fd0cd92bccf",
       "name": "Jane Smith",
       "email": "janesmith@example.com",
-      "created_at": "2024-04-28T12:00:00Z",
-      "updated_at": "2024-04-28T12:00:00Z"
+      "created_at": "2024-05-05T10:43:58.755Z",
+      "updated_at": "2024-05-05T10:43:58.955Z"
+    },
+    {
+      "id": "61385a81-b27d-49b3-a986-9dee37742375",
+      "name": "John Doe",
+      "username": "johndoe123",
+      "email": "johndoe@example.com",
+      "created_at": "2024-05-05T12:46:50.163Z",
+      "updated_at": "2024-05-05T12:46:50.163Z"
     }
   ],
   "meta": {
@@ -262,13 +263,17 @@ GET /api/v1/users/123456
   "code": 200,
   "message": "Detail data berhasil diambil",
   "data": {
-    "id": "123456",
+    "id": "61385a81-b27d-49b3-a986-9dee37742375",
     "name": "John Doe",
     "username": "johndoe123",
     "email": "johndoe@example.com",
+    "password": "$2b$10$N2bObQH9K.cDeNL5qKYs2uHUKkCG4Gr1JjmwcHLOliXk3BV4d3mOW",
     "role": "USER",
-    "created_at": "2024-04-27T12:00:00Z",
-    "updated_at": "2024-04-27T12:00:00Z"
+    "last_login": "2024-05-05T15:25:15.000Z",
+    "refresh_token": "$2b$10$6jsl9l5Gm2/v/elmSziHZea0cvPO/DnwN6/bEpqy46zYv7pcqLaPu",
+    "photo": "images/d66da0ea-a9de-446e-a021-372210d70678-johndoe123-photo_profile.png",
+    "created_at": "2024-05-05T12:46:50.163Z",
+    "updated_at": "2024-05-05T12:46:50.163Z"
   }
 }
 ```
@@ -289,7 +294,7 @@ PATCH /api/v1/users/:id
 
 | Key           | Value                 |
 | ------------- | --------------------- |
-| Content-Type  | application/json      |
+| Content-Type  | multipart/form-data   |
 | Authorization | Bearer <access_token> |
 
 #### Path Parameters
