@@ -32,13 +32,12 @@ export const googleAuthHandler = async (req, res, next) => {
 
     logger.info(`Pengguna berhasil masuk ke aplikasi: ${id}`);
 
-    return res.status(200).json(
-      response.success({
-        code: 200,
-        message: 'Pengguna berhasil masuk ke aplikasi',
-        data: { access_token: accessToken, refresh_token: refreshToken },
-      }),
+    const redirectUrl = `${process.env.APP_FRONTEND_URL}/auth/oauth/callback?access_token=${accessToken}&refresh_token=${refreshToken}`;
+    logger.info(
+      `Redirecting to: '${process.env.APP_FRONTEND_URL}/auth/oauth/callback' with access_token & refresh_token`,
     );
+
+    return res.redirect(redirectUrl);
   } catch (error) {
     return next(error);
   }
