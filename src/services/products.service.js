@@ -27,7 +27,6 @@ const create = async (payload) => {
       description: data.description,
       price: data.price,
       condition: data.condition,
-      brand: data.brand,
       model: data.model,
       specifications: {
         create: data.specifications.map((specification) => ({
@@ -47,7 +46,6 @@ const create = async (payload) => {
       title: true,
       price: true,
       condition: true,
-      brand: true,
       model: true,
       specifications: {
         select: {
