@@ -25,57 +25,68 @@ model User {
   photo         String?   @db.VarChar(255)
   created_at    DateTime  @default(now())
   updated_at    DateTime  @updatedAt
+  Seller        Seller?
 
   @@map("users")
 }
 
 model Category {
-  id          Int          @id @default(autoincrement())
-  name        String       @unique
-  slug        String       @db.VarChar(50)
-  created_at  DateTime     @default(now())
-  updated_at  DateTime     @updatedAt
-  products    Product[]
+  id         Int       @id @default(autoincrement())
+  name       String    @unique @db.VarChar(100)
+  slug       String    @db.VarChar(50)
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  products   Product[]
 
   @@map("categories")
 }
 
-model Product {
-  id             String           @id @default(uuid())
-  category_id    Int
-  title          String
-  description    String?
-  price          Decimal          @db.Decimal(10, 2)
-  condition      Condition
-  model          String?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  images         ProductImage[]
-  category       Category         @relation(fields: [category_id], references: [id])
-  specifications Specification[]
+model Seller {
+  id         String    @id @default(uuid())
+  user_id    String    @unique
+  domicile   String    @db.VarChar(50)
+  address    String    @db.VarChar(255)
+  phone      String    @db.VarChar(15)
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  user       User      @relation(fields: [user_id], references: [id])
+  Product    Product[]
 
+  @@index([user_id])
+  @@map("sellers")
+}
+
+model Product {
+  id          String         @id @default(uuid())
+  category_id Int
+  seller_id   String
+  title       String         @db.VarChar(100)
+  description String?
+  price       Decimal        @db.Decimal(10, 2)
+  condition   Condition
+  model       String         @db.VarChar(100)
+  color       String         @db.VarChar(50)
+  storage     String         @db.VarChar(50)
+  ram         String?        @db.VarChar(50)
+  created_at  DateTime       @default(now())
+  updated_at  DateTime       @updatedAt
+  images      ProductImage[]
+  category    Category       @relation(fields: [category_id], references: [id])
+  seller      Seller         @relation(fields: [seller_id], references: [id])
+
+  @@index([category_id])
+  @@index([seller_id])
   @@map("products")
 }
 
 model ProductImage {
-  id            Int         @id @default(autoincrement())
-  product_id    String
-  image_url     String
-  product       Product     @relation(fields: [product_id], references: [id])
+  id         Int     @id @default(autoincrement())
+  product_id String
+  image_url  String  @db.VarChar(255)
+  product    Product @relation(fields: [product_id], references: [id])
 
   @@index([product_id])
   @@map("product_images")
-}
-
-model Specification {
-  id         Int      @id @default(autoincrement())
-  product_id String
-  name       String
-  value      String
-  product    Product  @relation(fields: [product_id], references: [id])
-
-  @@index([product_id])
-  @@map("specifications")
 }
 
 enum UserRole {
