@@ -61,13 +61,12 @@ model Product {
   category_id Int
   seller_id   String
   title       String         @db.VarChar(100)
-  description String?
+  description String?        @db.Text
   price       Decimal        @db.Decimal(10, 2)
   condition   Condition
-  model       String         @db.VarChar(100)
   color       String         @db.VarChar(50)
-  storage     String         @db.VarChar(50)
-  ram         String?        @db.VarChar(50)
+  storage     String         @db.VarChar(20)
+  ram         String         @db.VarChar(20)
   created_at  DateTime       @default(now())
   updated_at  DateTime       @updatedAt
   images      ProductImage[]

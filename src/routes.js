@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import usersRoutes from './routers/users.route.js';
+import sellersRoutes from './routers/sellers.route.js';
 import authRoutes from './routers/auth.route.js';
 import oauthRoutes from './routers/oauth.route.js';
 import productsRoutes from './routers/products.route.js';
@@ -12,6 +13,7 @@ router.get('/', (req, res) => {
 });
 
 router.use('/users', usersRoutes);
+router.use('/sellers', sellersRoutes);
 router.use('/auth', authRoutes);
 router.use('/oauth', oauthRoutes);
 router.use('/products', productsRoutes);
