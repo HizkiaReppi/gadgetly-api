@@ -7,6 +7,7 @@ import {
 import validate from '../utils/validation.js';
 import prisma from '../utils/database.js';
 import NotFoundError from '../errors/NotFoundError.js';
+import { createPreSignedUrl } from './storage.service.js';
 
 const _checkUserDataExistence = async (userId) => {
   const isUserExists = await prisma.user.findUnique({
@@ -75,7 +76,7 @@ const findAll = async (limit, page) => {
 const findById = async (id) => {
   const data = await validate(getSellerByIdSchema, { id });
 
-  const user = await prisma.seller.findUnique({
+  const seller = await prisma.seller.findUnique({
     where: { id: data.id },
     include: {
       user: {
@@ -94,7 +95,13 @@ const findById = async (id) => {
     },
   });
 
-  return user;
+  if (seller.user?.photo && seller.user?.photo.startsWith('images/')) {
+    const photo = await createPreSignedUrl(seller.user.photo);
+
+    seller.user.photo = photo;
+  }
+
+  return seller;
 };
 
 const update = async (id, payload) => {
