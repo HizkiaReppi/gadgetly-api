@@ -6,11 +6,8 @@ const response = new Response();
 
 const create = async (req, res, next) => {
   try {
-    const payload = { ...req.body, images: req.files };
-
-    if (typeof payload.specifications === 'string') {
-      payload.specifications = JSON.parse(payload.specifications);
-    }
+    const { user } = res.locals;
+    const payload = { ...req.body, images: req.files, user_id: user.id };
 
     const data = await productService.create(payload);
 

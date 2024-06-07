@@ -8,7 +8,7 @@ const router = Router();
 router.post(
   '/',
   uploader.array('images'),
-  // isAuthenticate
+  isAuthenticate,
   productsController.create,
 );
 router.get('/', productsController.findAll);

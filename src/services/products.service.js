@@ -8,12 +8,37 @@ import {
 import validate from '../utils/validation.js';
 import prisma from '../utils/database.js';
 import { writeFile, createPreSignedUrl } from './storage.service.js';
+import NotFoundError from '../errors/NotFoundError.js';
+
+const _checkCategoryExist = async (id) => {
+  const category = await prisma.category.findUnique({
+    where: {
+      id: Number(id),
+    },
+  });
+  if (!category) throw new NotFoundError('Category tidak ditemukan');
+};
+
+const _checkSeller = async (userId) => {
+  const seller = await prisma.seller.findUnique({
+    where: {
+      user_id: userId,
+    },
+  });
+
+  if (!seller) {
+    throw new NotFoundError('Pengguna belum terdaftar sebagai Penjual');
+  }
+
+  return seller;
+};
 
 const create = async (payload) => {
   const data = await validate(createProductSchema, payload);
+  const seller = await _checkSeller(data.user_id);
+  await _checkCategoryExist(data.category_id);
 
   let images;
-
   if (data.images) {
     const result = await writeFile(data.images);
 
@@ -24,39 +49,17 @@ const create = async (payload) => {
     data: {
       category_id: data.category_id,
       title: data.title,
-      description: data.description,
+      seller_id: seller.id,
+      description: data?.description,
       price: data.price,
       condition: data.condition,
-      model: data.model,
-      specifications: {
-        create: data.specifications.map((specification) => ({
-          name: specification.name,
-          value: specification.value,
-        })),
-      },
+      color: data.color,
+      storage: data.storage,
+      ram: data.ram,
       images: {
         create: images.map((image) => ({
           image_url: image.key,
         })),
-      },
-    },
-    select: {
-      id: true,
-      category_id: true,
-      title: true,
-      price: true,
-      condition: true,
-      model: true,
-      specifications: {
-        select: {
-          name: true,
-          value: true,
-        },
-      },
-      images: {
-        select: {
-          image_url: true,
-        },
       },
     },
   });
@@ -66,40 +69,49 @@ const create = async (payload) => {
 
 const findAll = async (limit, page) => {
   const data = await validate(getAllProductSchema, { limit, page });
-  const skip = (data.page - 1) * data.limit;
-  const product = await prisma.product.findMany({
-    skip,
+
+  const products = await prisma.product.findMany({
+    skip: (data.page - 1) * data.limit,
     take: data.limit,
     orderBy: { title: 'asc' },
     select: {
       id: true,
-      category_id: true,
+      category: {
+        select: {
+          name: true,
+          slug: true,
+        },
+      },
+      seller: {
+        select: {
+          domicile: true,
+          user: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
       title: true,
       price: true,
-      condition: true,
-      model: true,
-      images: true,
+      color: true,
+      storage: true,
+      images: {
+        select: { image_url: true },
+        take: 1,
+      },
       created_at: true,
+      updated_at: true,
     },
   });
 
-  const imagePromises = product.map((item) =>
-    Promise.all(
-      item.images.map(async (image) => {
-        const photo = await createPreSignedUrl(image.image_url);
-        return { ...image, image_url: photo };
-      }),
-    ),
-  );
-
-  const images = await Promise.all(imagePromises);
-
-  return product.map((item, index) => {
-    item.images = images[index].map((image) => ({
-      image_url: image.image_url,
-    }));
-    return item;
+  const imagePromises = products.map(async (product) => {
+    const imageUrl = product.images[0].image_url;
+    const preSignedUrl = await createPreSignedUrl(imageUrl);
+    return { ...product, images: preSignedUrl };
   });
+
+  return Promise.all(imagePromises);
 };
 
 const findById = async (id) => {
@@ -107,18 +119,26 @@ const findById = async (id) => {
 
   const product = await prisma.product.findUnique({
     where: { id },
-    select: {
-      id: true,
-      category_id: true,
-      title: true,
-      description: true,
-      price: true,
-      condition: true,
-      model: true,
-      specifications: {
+    include: {
+      category: {
         select: {
           name: true,
-          value: true,
+          slug: true,
+        },
+      },
+      seller: {
+        select: {
+          id: true,
+          domicile: true,
+          address: true,
+          phone: true,
+          user: {
+            select: {
+              name: true,
+              photo: true,
+              last_login: true,
+            },
+          },
         },
       },
       images: {

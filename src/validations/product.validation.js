@@ -1,11 +1,17 @@
 import Joi from 'joi';
 
 export const createProductSchema = Joi.object({
-  title: Joi.string().required().messages({
-    'string.base': 'Judul harus berupa teks',
-    'any.required': 'Judul wajib diisi',
+  title: Joi.string().min(3).max(100).required().messages({
+    'string.base': 'Nama produk harus berupa teks',
+    'string.min': 'Nama produk harus memiliki panjang minimal 3 karakter.',
+    'string.max': 'Nama produk harus memiliki panjang maksimal 100 karakter.',
+    'any.required': 'Nama produk wajib diisi',
   }),
-  description: Joi.string().allow(null, ''),
+  description: Joi.string().max(1000).allow(null, '').messages({
+    'string.base': 'Deskripsi harus berupa teks',
+    'string.max':
+      'Deskripsi produk harus memiliki panjang maksimal 1000 karakter.',
+  }),
   price: Joi.number().precision(2).required().messages({
     'number.base': 'Harga harus berupa angka',
     'any.required': 'Harga wajib diisi',
@@ -18,26 +24,22 @@ export const createProductSchema = Joi.object({
       'any.only': 'Kondisi harus salah satu dari [BARU, NORMAL, DIPERBAHARUI]',
       'any.required': 'Kondisi wajib diisi',
     }),
-  brand: Joi.string().allow(null, ''),
-  model: Joi.string().allow(null, ''),
-  specifications: Joi.array()
-    .items(
-      Joi.object({
-        name: Joi.string().required().messages({
-          'string.base': 'Kunci Spesifikasi harus berupa teks',
-          'any.required': 'Kunci Spesifikasi wajib diisi',
-        }),
-        value: Joi.string().required().messages({
-          'string.base': 'Nilai Spesifikasi harus berupa teks',
-          'any.required': 'Nilai Spesifikasi wajib diisi',
-        }),
-      }),
-    )
-    .required()
-    .messages({
-      'array.base': 'Spesifikasi harus berupa array',
-      'any.required': 'Spesifikasi wajib diisi',
-    }),
+  color: Joi.string().max(50).required().messages({
+    'string.base': 'Warna produk harus berupa teks',
+    'string.max': 'Warna produk harus memiliki panjang maksimal 50 karakter.',
+    'any.required': 'Warna produk wajib diisi',
+  }),
+  storage: Joi.string().max(20).required().messages({
+    'string.base': 'Penyimpanan produk harus berupa teks',
+    'string.max':
+      'Penyimpanan produk harus memiliki panjang maksimal 20 karakter.',
+    'any.required': 'Penyimpanan produk wajib diisi',
+  }),
+  ram: Joi.string().max(20).required().messages({
+    'string.base': 'RAM produk harus berupa teks',
+    'string.max': 'RAM produk harus memiliki panjang maksimal 20 karakter.',
+    'any.required': 'RAM produk wajib diisi',
+  }),
   images: Joi.array().items(
     Joi.object({
       fieldname: Joi.string().optional(),
@@ -60,6 +62,10 @@ export const createProductSchema = Joi.object({
   category_id: Joi.number().integer().required().messages({
     'number.base': 'ID Kategori harus berupa angka',
     'any.required': 'ID Kategori wajib diisi',
+  }),
+  user_id: Joi.string().required().messages({
+    'number.base': 'ID Pengguna harus berupa text',
+    'any.required': 'ID Pengguna wajib diisi',
   }),
 });
 
