@@ -54,9 +54,27 @@ const findAll = async (req, res, next) => {
   }
 };
 
-const findById = async (req, res, next) => {
+const findBySellerId = async (req, res, next) => {
   try {
-    const data = await sellersService.findById(req.params.id);
+    const data = await sellersService.findBySellerId(req.params.id);
+
+    logger.info(`Detail data berhasil diambil: ${data.id}`);
+
+    res.status(200).json(
+      response.success({
+        code: 200,
+        message: 'Detail data berhasil diambil',
+        data,
+      }),
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+const findByUserId = async (req, res, next) => {
+  try {
+    const data = await sellersService.findByUserId(req.params.id);
 
     logger.info(`Detail data berhasil diambil: ${data.id}`);
 
@@ -113,4 +131,11 @@ const destroy = async (req, res, next) => {
   }
 };
 
-export default { create, findAll, findById, update, destroy };
+export default {
+  create,
+  findAll,
+  findBySellerId,
+  findByUserId,
+  update,
+  destroy,
+};

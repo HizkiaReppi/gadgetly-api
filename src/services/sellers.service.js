@@ -73,7 +73,7 @@ const findAll = async (limit, page) => {
   return sellers;
 };
 
-const findById = async (id) => {
+const findBySellerId = async (id) => {
   const data = await validate(getSellerByIdSchema, { id });
 
   const seller = await prisma.seller.findUnique({
@@ -95,7 +95,42 @@ const findById = async (id) => {
     },
   });
 
-  if (seller.user?.photo && seller.user?.photo.startsWith('images/')) {
+  if (!seller) throw new NotFoundError('Penjual tidak ditemukan.');
+
+  if (seller?.user?.photo && seller?.user?.photo.startsWith('images/')) {
+    const photo = await createPreSignedUrl(seller.user.photo);
+
+    seller.user.photo = photo;
+  }
+
+  return seller;
+};
+
+const findByUserId = async (id) => {
+  const data = await validate(getSellerByIdSchema, { id });
+
+  const seller = await prisma.seller.findUnique({
+    where: { user_id: data.id },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          photo: true,
+          last_login: true,
+          username: true,
+          email: true,
+          created_at: true,
+          updated_at: true,
+        },
+      },
+      Product: true,
+    },
+  });
+
+  if (!seller) throw new NotFoundError('Penjual tidak ditemukan.');
+
+  if (seller?.user?.photo && seller?.user?.photo.startsWith('images/')) {
     const photo = await createPreSignedUrl(seller.user.photo);
 
     seller.user.photo = photo;
@@ -140,7 +175,8 @@ const count = async () => {
 export default {
   create,
   findAll,
-  findById,
+  findBySellerId,
+  findByUserId,
   update,
   destroy,
   count,

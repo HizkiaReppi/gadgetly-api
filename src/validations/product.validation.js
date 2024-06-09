@@ -48,14 +48,15 @@ export const createProductSchema = Joi.object({
         .valid('image/jpeg', 'image/jpg', 'image/png')
         .optional()
         .messages({
-          'string.base': 'Tipe file foto tidak valid.',
-          'any.only': 'Hanya format JPEG, JPG atau PNG yang diperbolehkan.',
+          'string.base': 'Tipe File foto tidak valid.',
+          'any.only':
+            'Hanya format File JPEG, JPG atau PNG yang diperbolehkan.',
         }),
       buffer: Joi.binary().optional(),
       encoding: Joi.string().optional(),
       size: Joi.number().integer().min(0).max(2097152).optional().messages({
-        'number.min': 'Ukuran file maksimal 2mb.',
-        'number.max': 'Ukuran file maksimal 2mb.',
+        'number.min': 'Ukuran File maksimal 2mb.',
+        'number.max': 'Ukuran File maksimal 2mb.',
       }),
     }),
   ),
