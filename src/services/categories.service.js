@@ -53,6 +53,7 @@ const findAll = async (limit, page) => {
     select: {
       id: true,
       name: true,
+      slug: true,
       products: {
         select: {
           id: true,
@@ -84,13 +85,16 @@ const findBySlug = async (slug) => {
     select: {
       id: true,
       name: true,
+      slug: true,
       products: {
         select: {
           id: true,
           title: true,
           price: true,
           images: true,
-          model: true,
+          color: true,
+          storage: true,
+          ram: true,
         },
       },
       created_at: true,
