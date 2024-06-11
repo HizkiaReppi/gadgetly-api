@@ -81,6 +81,10 @@ export const getAllProductSchema = Joi.object({
     'number.min': 'Page harus memiliki panjang minimal 1.',
     'number.integer': 'Page harus berupa angka.',
   }),
+  sort: Joi.string().valid('title', 'latest').optional().messages({
+    'string.base': 'Sort harus berupa teks',
+    'any.only': 'Sort harus salah satu dari [title, latest]',
+  }),
 });
 
 export const getProductByIdSchema = Joi.object({

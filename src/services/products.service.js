@@ -67,13 +67,20 @@ const create = async (payload) => {
   return product;
 };
 
-const findAll = async (limit, page) => {
-  const data = await validate(getAllProductSchema, { limit, page });
+const findAll = async (limit, page, sort) => {
+  const data = await validate(getAllProductSchema, { limit, page, sort });
 
   const products = await prisma.product.findMany({
     skip: (data.page - 1) * data.limit,
     take: data.limit,
-    orderBy: { title: 'asc' },
+    orderBy:
+      data.sort === 'latest'
+        ? {
+            created_at: 'desc',
+          }
+        : {
+            title: 'asc',
+          },
     select: {
       id: true,
       category: {

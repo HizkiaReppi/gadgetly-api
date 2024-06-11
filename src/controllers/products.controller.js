@@ -32,8 +32,9 @@ const findAll = async (req, res, next) => {
   try {
     const limit = req.query.limit || 10;
     const page = req.query.page || 1;
+    const sort = req.query.sort || 'title';
 
-    const data = await productService.findAll(limit, page);
+    const data = await productService.findAll(limit, page, sort);
     const totalData = await productService.count();
 
     logger.info('Semua data berhasil diambil');

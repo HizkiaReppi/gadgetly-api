@@ -9,6 +9,7 @@ import prisma from '../utils/database.js';
 import ResponseError from '../errors/ResponseError.js';
 import { generateSlug } from '../utils/format.js';
 import NotFoundError from '../errors/NotFoundError.js';
+import { createPreSignedUrl } from './storage.service.js';
 
 const _checkDataExistence = async (name) => {
   const isCategoryExists = await prisma.category.findUnique({
@@ -106,7 +107,24 @@ const findBySlug = async (slug) => {
     throw new NotFoundError('Category tidak ditemukan.');
   }
 
-  return category;
+  // const imagePromises = category.products.map(async (product) => {
+  //   const imageUrl = product.images[0].image_url;
+  //   const preSignedUrl = await createPreSignedUrl(imageUrl);
+  //   return { ...category, images: preSignedUrl };
+  // });
+
+  // create pre signed url untuk image
+  const imagePromises = category.products.map(async (product) => {
+    const imageUrl = product.images[0].image_url;
+    const preSignedUrl = await createPreSignedUrl(imageUrl);
+    return {
+      ...product,
+      images: preSignedUrl,
+    };
+  });
+
+  const product = await Promise.all(imagePromises);
+  return { ...category, products: product };
 };
 
 const update = async (id, payload) => {
