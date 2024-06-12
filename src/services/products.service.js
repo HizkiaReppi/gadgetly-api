@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 import {
   createProductSchema,
   getAllProductSchema,
@@ -146,6 +145,16 @@ const findById = async (id) => {
               last_login: true,
             },
           },
+          Product: {
+            include: {
+              images: {
+                select: {
+                  image_url: true,
+                },
+                take: 1,
+              },
+            },
+          },
         },
       },
       images: {
@@ -156,13 +165,24 @@ const findById = async (id) => {
     },
   });
 
-  if (product && product.images) {
-    const imagePromises = product.images.map(async (image) => {
+  if (!product) {
+    return null;
+  }
+
+  const createPreSignedUrls = async (images) => {
+    const imagePromises = images.map(async (image) => {
       const photo = await createPreSignedUrl(image.image_url);
       return { ...image, image_url: photo };
     });
+    return Promise.all(imagePromises);
+  };
 
-    product.images = await Promise.all(imagePromises);
+  product.images = await createPreSignedUrls(product.images);
+
+  if (product.seller && product.seller.Product) {
+    for (const prod of product.seller.Product) {
+      prod.images = await createPreSignedUrls(prod.images);
+    }
   }
 
   return product;
