@@ -98,3 +98,7 @@ export const searchProductSchema = Joi.object({
     'any.required': 'Id wajib diisi.',
   }),
 });
+
+export const getProductByIdsSchema = Joi.object({
+  ids: Joi.array().items(Joi.string().required()).required(),
+});

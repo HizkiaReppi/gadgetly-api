@@ -73,6 +73,24 @@ const findById = async (req, res, next) => {
   }
 };
 
+const findByIds = async (req, res, next) => {
+  try {
+    const data = await productService.findByIds(req.body);
+
+    logger.info('Data berhasil diambil');
+
+    res.status(200).json(
+      response.success({
+        code: 200,
+        message: 'Detail data berhasil diambil',
+        data,
+      }),
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
 const searchProducts = async (req, res, next) => {
   try {
     const { search } = req.query;
@@ -93,4 +111,4 @@ const searchProducts = async (req, res, next) => {
   }
 };
 
-export default { create, findAll, findById, searchProducts };
+export default { create, findAll, findById, searchProducts, findByIds };

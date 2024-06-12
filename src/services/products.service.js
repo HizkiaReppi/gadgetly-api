@@ -3,6 +3,7 @@ import {
   getAllProductSchema,
   getProductByIdSchema,
   searchProductSchema,
+  getProductByIdsSchema,
 } from '../validations/product.validation.js';
 import validate from '../utils/validation.js';
 import prisma from '../utils/database.js';
@@ -201,9 +202,67 @@ const searchProducts = async (query) => {
   });
 };
 
+const findByIds = async (ids) => {
+  const data = await validate(getProductByIdsSchema, ids);
+  const products = await prisma.product.findMany({
+    where: {
+      id: {
+        in: data.ids,
+      },
+    },
+    select: {
+      id: true,
+      category: {
+        select: {
+          name: true,
+          slug: true,
+        },
+      },
+      seller: {
+        select: {
+          domicile: true,
+          user: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+      title: true,
+      price: true,
+      color: true,
+      storage: true,
+      ram: true,
+      condition: true,
+      description: true,
+      images: {
+        select: { image_url: true },
+        take: 1,
+      },
+      created_at: true,
+      updated_at: true,
+    },
+  });
+
+  const imagePromises = products.map(async (product) => {
+    const imageUrl = product.images[0]?.image_url;
+    const preSignedUrl = imageUrl ? await createPreSignedUrl(imageUrl) : null;
+    return { ...product, images: preSignedUrl };
+  });
+
+  return Promise.all(imagePromises);
+};
+
 const count = async () => {
   const totalData = await prisma.product.count();
   return totalData;
 };
 
-export default { create, findAll, findById, searchProducts, count };
+export default {
+  create,
+  findAll,
+  findById,
+  searchProducts,
+  count,
+  findByIds,
+};

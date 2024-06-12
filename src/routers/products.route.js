@@ -13,6 +13,7 @@ router.post(
 );
 router.get('/', productsController.findAll);
 router.get('/:id', productsController.findById);
+router.post('/find-by-ids', productsController.findByIds);
 router.get('/', productsController.searchProducts);
 
 export default router;
