@@ -151,7 +151,7 @@ const findByIds = async (ids) => {
 };
 
 const findByUserId = async (userId) => {
-  const data = await validate(getOrdersByUserSchema, { userId });
+  const data = await validate(getOrdersByUserSchema, { user_id: userId });
 
   const orders = await prisma.order.findMany({
     where: {
@@ -189,7 +189,7 @@ const findByUserId = async (userId) => {
 };
 
 const findBySellerId = async (sellerId) => {
-  const data = await validate(getOrdersBySellerSchema, { sellerId });
+  const data = await validate(getOrdersBySellerSchema, { seller_id: sellerId });
 
   const orders = await prisma.order.findMany({
     where: {

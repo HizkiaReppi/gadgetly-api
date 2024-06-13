@@ -74,7 +74,7 @@ const findById = async (req, res, next) => {
 
 const findByUserId = async (req, res, next) => {
   try {
-    const data = await ordersService.findById(req.params.userId);
+    const data = await ordersService.findByUserId(req.params.id);
 
     logger.info(`Detail data berhasil diambil: ${data.id}`);
 
@@ -92,7 +92,7 @@ const findByUserId = async (req, res, next) => {
 
 const findBySellerId = async (req, res, next) => {
   try {
-    const data = await ordersService.findById(req.params.sellerId);
+    const data = await ordersService.findBySellerId(req.params.id);
 
     logger.info(`Detail data berhasil diambil: ${data.id}`);
 
