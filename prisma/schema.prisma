@@ -26,6 +26,7 @@ model User {
   created_at    DateTime  @default(now())
   updated_at    DateTime  @updatedAt
   Seller        Seller?
+  Order         Order[]
 
   @@map("users")
 }
@@ -72,6 +73,7 @@ model Product {
   images      ProductImage[]
   category    Category       @relation(fields: [category_id], references: [id])
   seller      Seller         @relation(fields: [seller_id], references: [id])
+  OrderItem   OrderItem[]
 
   @@index([category_id])
   @@index([seller_id])
@@ -86,6 +88,80 @@ model ProductImage {
 
   @@index([product_id])
   @@map("product_images")
+}
+
+model Order {
+  id              String       @id @default(uuid())
+  user_id         String
+  total_price     Decimal      @db.Decimal(10, 2)
+  status          OrderStatus  @default(PENDING)
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
+  delivery        Delivery?
+  user            User         @relation(fields: [user_id], references: [id])
+  items           OrderItem[]
+  detail          OrderDetail?
+
+  @@index([user_id])
+  @@map("orders")
+}
+
+model OrderDetail {
+  id              String   @id @default(uuid())
+  order_id        String   @unique
+  fullname        String   @db.VarChar(100)
+  phone           String   @db.VarChar(15)
+  whatsapp        String   @db.VarChar(15)
+  address         String   @db.VarChar(255)
+  email           String   @db.VarChar(255)
+  payment_method  String   @db.VarChar(255)
+  shipping_method String   @db.VarChar(255)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  order           Order    @relation(fields: [order_id], references: [id])
+
+  @@index([order_id])
+  @@map("order_details")
+}
+
+model OrderItem {
+  id         String  @id @default(uuid())
+  order_id   String
+  product_id String
+  order      Order   @relation(fields: [order_id], references: [id])
+  product    Product @relation(fields: [product_id], references: [id])
+
+  @@index([order_id])
+  @@index([product_id])
+  @@map("order_items")
+}
+
+model Delivery {
+  id              String         @id @default(uuid())
+  order_id        String         @unique
+  tracking_number String?
+  status          DeliveryStatus @default(PENDING)
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
+  order           Order          @relation(fields: [order_id], references: [id])
+
+  @@index([order_id])
+  @@map("deliveries")
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum DeliveryStatus {
+  PENDING
+  SHIPPED
+  DELIVERED
+  RETURNED
 }
 
 enum UserRole {
