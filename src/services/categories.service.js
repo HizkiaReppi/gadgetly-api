@@ -1,3 +1,5 @@
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-await-in-loop */
 import {
   createCategorySchema,
   getAllCategorySchema,
@@ -47,6 +49,7 @@ const create = async (payload) => {
 const findAll = async (limit, page) => {
   const data = await validate(getAllCategorySchema, { limit, page });
   const skip = (data.page - 1) * data.limit;
+
   const categories = await prisma.category.findMany({
     skip,
     take: data.limit,
@@ -60,7 +63,12 @@ const findAll = async (limit, page) => {
           id: true,
           title: true,
           price: true,
-          images: true,
+          images: {
+            select: {
+              image_url: true,
+            },
+            take: 1,
+          },
           color: true,
           storage: true,
           ram: true,
@@ -73,6 +81,22 @@ const findAll = async (limit, page) => {
 
   if (!categories || categories.length < 1) {
     throw new NotFoundError('Category tidak ditemukan.');
+  }
+
+  // Mengambil pre-signed URL untuk setiap gambar produk
+  for (const category of categories) {
+    const productPromises = category.products.map(async (product) => {
+      if (product.images && product.images.length > 0) {
+        const imageUrl = product.images[0].image_url;
+        const preSignedUrl = await createPreSignedUrl(imageUrl);
+        return {
+          ...product,
+          images: [preSignedUrl],
+        };
+      }
+      return product;
+    });
+    category.products = await Promise.all(productPromises);
   }
 
   return categories;
