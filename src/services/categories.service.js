@@ -102,15 +102,13 @@ const findAll = async (limit, page) => {
   return categories;
 };
 
-const findBySlug = async (slug) => {
-  const data = await validate(getCategoryBySlugSchema, { slug });
+const findBySlug = async (slug, limit, page) => {
+  const data = await validate(getCategoryBySlugSchema, { slug, limit, page });
+  const skip = (data.page - 1) * data.limit;
 
   const category = await prisma.category.findUnique({
     where: { name: data.slug },
-    select: {
-      id: true,
-      name: true,
-      slug: true,
+    include: {
       products: {
         select: {
           id: true,
@@ -121,9 +119,9 @@ const findBySlug = async (slug) => {
           storage: true,
           ram: true,
         },
+        skip,
+        take: limit,
       },
-      created_at: true,
-      updated_at: true,
     },
   });
 
@@ -131,13 +129,6 @@ const findBySlug = async (slug) => {
     throw new NotFoundError('Category tidak ditemukan.');
   }
 
-  // const imagePromises = category.products.map(async (product) => {
-  //   const imageUrl = product.images[0].image_url;
-  //   const preSignedUrl = await createPreSignedUrl(imageUrl);
-  //   return { ...category, images: preSignedUrl };
-  // });
-
-  // create pre signed url untuk image
   const imagePromises = category.products.map(async (product) => {
     const imageUrl = product.images[0].image_url;
     const preSignedUrl = await createPreSignedUrl(imageUrl);

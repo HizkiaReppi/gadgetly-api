@@ -31,6 +31,16 @@ export const getCategoryBySlugSchema = Joi.object({
   slug: Joi.string().required().messages({
     'any.required': 'Id wajib diisi.',
   }),
+  limit: Joi.number().integer().min(1).required().messages({
+    'any.required': 'Limit wajib diisi.',
+    'number.min': 'Limit harus memiliki panjang minimal 1.',
+    'number.integer': 'Limit harus berupa angka.',
+  }),
+  page: Joi.number().integer().min(1).required().messages({
+    'any.required': 'Page wajib diisi.',
+    'number.min': 'Page harus memiliki panjang minimal 1.',
+    'number.integer': 'Page harus berupa angka.',
+  }),
 });
 
 export const getCategoryByIdSchema = Joi.object({

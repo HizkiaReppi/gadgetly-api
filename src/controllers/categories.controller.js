@@ -58,7 +58,11 @@ const findAll = async (req, res, next) => {
 
 const findBySlug = async (req, res, next) => {
   try {
-    const data = await categoriesService.findBySlug(req.params.slug);
+    const { slug } = req.params;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const page = parseInt(req.query.page, 10) || 1;
+
+    const data = await categoriesService.findBySlug(slug, limit, page);
 
     logger.info(`Detail data berhasil diambil: ${data.id}`);
 
